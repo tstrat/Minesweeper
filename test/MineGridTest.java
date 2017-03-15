@@ -60,6 +60,27 @@ public class MineGridTest {
 
     }
 
+    @Test
+    public void testDefaultConstructor() {
+        MineGrid m = new MineGrid();
+        // board is 9x9 with 10 bombs
+        assertEquals(9, m.getBoard().length);
+        assertEquals(9, m.getBoard()[0].length);
+        int cnt = 0;
+
+        for (int i = 0; i < m.getBoard().length; i++) {
+            for (int k = 0; k < m.getBoard()[i].length; k++) {
+                if (m.getBoard()[i][k].getValue() == '*') {
+                    cnt++;
+                }
+            }
+        }
+
+        assertEquals(cnt, m.getBombCount());
+        System.out.println(m.toString());
+
+    }
+
     /* -------------------------------
         Game Mechanics TESTS
        ------------------------------- */
@@ -137,4 +158,5 @@ public class MineGridTest {
         assertFalse(board[2][2].isVisible());
         assertTrue(m.hasWon());
     }
+
 }

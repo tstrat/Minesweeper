@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Created by travis on 3/13/17.
@@ -46,15 +47,48 @@ public class MineGrid {
 
 
     private Cell[][] board;  // the array representation of the game board
-    private int numBombs = 10;   // the total number of bombs on the board (default 10)
-    private int numFlags = 10;  // total flags equals bombs
-
+    private int numBombs;   // the total number of bombs on the board (default 10)
+    private int numFlags;  // total flags equals bombs
+    private final char BOMB = '*';
     // Used for calculating win condition fast
     private int totalTiles;
     private int revealedTiles = 0; // revealed always starts at zero
 
     public MineGrid() {
+        // Default will be beginner 9x9, 10bombs
+        numBombs = 10;
+        numFlags = 10;
+        createBlankBoard(9,9);
+        setBombs(numBombs, 9, 9);
+        setCellAdjBombNum();
+    }
 
+    // TO-DO: FINISH THIS SETTING CONSTRUCTOR
+    public MineGrid(String difficulty) {
+        //  initialize game board with default scale size
+        //  Microsoft has 3 levels, Beginner:   9x9, 10 bombs
+        //                          Intermediate: 16x16, 40 bombs
+        //                          Expert:     30x16, 99 bombs
+        int rows, cols, bombCnt;
+        switch (difficulty) {
+
+            case "intermediate":
+                rows = 9;
+                cols = 9;
+                bombCnt = 10;
+                break;
+            case "expert":
+                rows = 9;
+                cols = 9;
+                bombCnt = 10;
+                break;
+            case "beginner":  // use cascading effect to get default
+            default:
+                rows = 9;
+                cols = 9;
+                bombCnt = 10;
+                break;
+        }
     }
 
     /**
@@ -71,7 +105,7 @@ public class MineGrid {
 
         for (int i = 0; i < board.length; i++) {
             for (int k = 0; k < board[i].length; k++) {
-                if (testBoard[i][k] == '*') {
+                if (testBoard[i][k] == BOMB) {
                     numBombs++;  // if bomb, count it
                     numFlags++;
                 }
@@ -91,6 +125,54 @@ public class MineGrid {
 
     public int getNumFlags() {
         return numFlags;
+    }
+
+    private void createBlankBoard(int rows, int cols) {
+        board = new Cell[rows][cols];
+        for(int i = 0; i < rows; i++) {
+            for (int k = 0; k < cols; k++) {
+                board[i][k] = new Cell('.');
+            }
+        }
+    }
+
+    private void setBombs(int bombCnt, int rows, int cols) {
+        Random rgen = new Random();
+        int r,c;
+        while(bombCnt > 0) {
+            r = rgen.nextInt(rows);
+            c = rgen.nextInt(cols);
+            if (board[r][c].getValue() != '*'){
+                board[r][c].setValue('*');
+                bombCnt--;
+            }
+        }
+    }
+
+    private void setCellAdjBombNum() {
+        for(int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                if (board[i][k].getValue() != BOMB) {
+                    board[i][k].setValue(Character.forDigit(getNeighborBombCnt(i, k), 9)); // 8 is max neighbor
+                }
+            }
+        }
+    }
+
+    private int getNeighborBombCnt(int r, int c) {
+        int cnt = 0;
+        for(int i = r - 1; i <= r + 1; i++) {
+            for (int k = c - 1; k <= c + 1; k++) {
+                if(!(i==r && k == c)) {
+                    if (!(i < 0 || i > board.length-1) && !(k < 0 || k > board[i].length-1)){
+                        if (board[i][k].getValue() == BOMB) {
+                            cnt++;
+                        }
+                    }
+                }
+            }
+        }
+        return cnt;
     }
 
     /**
@@ -118,7 +200,7 @@ public class MineGrid {
         }
         current.toggleVisible();
         revealedTiles++;
-        if (current.getValue() == '*') {
+        if (current.getValue() == BOMB) {
             return true;  // lost the game
         }
         return false;
@@ -137,5 +219,18 @@ public class MineGrid {
             current.toggleFlagged();
         }
 
+    }
+
+    public String toString() {
+        String str = "Minesweeper:\n";
+
+        for(int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                str += board[i][k].getValue() + " ";
+            }
+            str += "\n";
+        }
+
+        return str;
     }
 }
