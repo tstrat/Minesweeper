@@ -10,16 +10,20 @@ import static org.junit.Assert.*;
 
 public class MineGridTest {
 
-    private int[][] getTestBoard() {
-        return new int[][] {{0, 0, 0, 0, 0},
-                            {0, 1, 1, 1, 0},
-                            {0, 1, -1, 1, 0}, // 1 bomb in mid of 5x5
-                            {0, 1, 1, 1, 0},
-                            {0, 0, 0, 0, 0}};
+    private char[][] getTestBoard() {
+        return new char[][] {{' ', ' ', ' ', ' ', ' '},
+                            {' ', '1', '1', '1', ' '},
+                            {' ', '1', '*', '1', ' '}, // 1 bomb in mid of 5x5
+                            {' ', '1', '1', '1', ' '},
+                            {' ', ' ', ' ', ' ', ' '}};
     }
+
+    /* -------------------------------
+        CONSTRUCTOR/INITIATION TESTS
+       ------------------------------- */
     @Test
     public void testConstructorWithGivenBoard() {
-        int[][] testBoard = getTestBoard();
+        char[][] testBoard = getTestBoard();
         MineGrid m = new MineGrid(testBoard);
 
         assertEquals(testBoard.length, m.getBoard().length);  // 5 long
@@ -29,8 +33,30 @@ public class MineGridTest {
         //Verify that all the elements of the board are equal
         for (int i = 0; i < testBoard.length; i++) {
             for (int k = 0; k < testBoard[i].length; k++) {
-                assertEquals(m.getBoard()[i][k], testBoard[i][k]);
+                assertEquals(m.getBoard()[i][k].getValue(), testBoard[i][k]);
             }
         }
+    }
+
+    @Test
+    public void testBombCountInGivenBoard() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+
+        assertEquals(1, m.getBombCount());
+    }
+
+    @Test
+    public void testAllCellsInvisibleAtStart() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+        MineGrid.Cell[][] board = m.getBoard();
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                assertFalse(board[i][k].isVisible());
+            }
+        }
+
     }
 }
