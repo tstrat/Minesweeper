@@ -11,11 +11,11 @@ import static org.junit.Assert.*;
 public class MineGridTest {
 
     private char[][] getTestBoard() {
-        return new char[][] {{' ', ' ', ' ', ' ', ' '},
-                            {' ', '1', '1', '1', ' '},
-                            {' ', '1', '*', '1', ' '}, // 1 bomb in mid of 5x5
-                            {' ', '1', '1', '1', ' '},
-                            {' ', ' ', ' ', ' ', ' '}};
+        return new char[][]{{' ', ' ', ' ', ' ', ' '},
+                {' ', '1', '1', '1', ' '},
+                {' ', '1', '*', '1', ' '}, // 1 bomb in mid of 5x5
+                {' ', '1', '1', '1', ' '},
+                {' ', ' ', ' ', ' ', ' '}};
     }
 
     /* -------------------------------
@@ -58,5 +58,83 @@ public class MineGridTest {
             }
         }
 
+    }
+
+    /* -------------------------------
+        Game Mechanics TESTS
+       ------------------------------- */
+
+    @Test
+    public void testNotWinAtStart() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+        MineGrid.Cell[][] board = m.getBoard();
+
+        assertFalse(m.hasWon());
+    }
+
+    @Test
+    public void testNotWinAfterRevealAll() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+        MineGrid.Cell[][] board = m.getBoard();
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                m.revealTile(i, k);
+            }
+        }
+        assertFalse(m.hasWon());
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                assertTrue(board[i][k].isVisible());
+            }
+        }
+    }
+
+    @Test
+    public void testWinCorrect() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+        MineGrid.Cell[][] board = m.getBoard();
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                if (!(i==2 && k ==2)) {
+                    m.revealTile(i, k);
+                }
+            }
+        }
+        assertTrue(m.hasWon());
+    }
+
+    @Test
+    public void testRevealWithFlags() {
+        char[][] testBoard = getTestBoard();
+        MineGrid m = new MineGrid(testBoard);
+        MineGrid.Cell[][] board = m.getBoard();
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                assertFalse(board[i][k].isFlagged());
+            }
+        }
+
+        m.flagTile(2,2);
+        assertTrue(board[2][2].isFlagged());
+
+        m.revealTile(2,2);
+        assertFalse(board[2][2].isVisible());
+
+        for (int i = 0; i < board.length; i++) {
+            for (int k = 0; k < board[i].length; k++) {
+                    m.revealTile(i, k);
+            }
+        }
+
+        assertTrue(board[2][2].isFlagged());
+        assertFalse(board[2][2].isVisible());
+        assertTrue(m.hasWon());
     }
 }
