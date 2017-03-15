@@ -25,14 +25,6 @@ public class MineGrid {
     }
 
     public int[][] getBoard() {
-        if (board == null) {
-            return board;
-        }
-        int[][] copyOfBoard;
-        copyOfBoard = new int[board.length][];
-        for (int i = 0; i < board.length; i++) {
-            copyOfBoard[i] = Arrays.copyOf(board[i], board[i].length);
-        }
-        return copyOfBoard;
+        return board;
     }
 }
